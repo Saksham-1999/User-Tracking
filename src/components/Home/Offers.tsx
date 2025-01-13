@@ -17,6 +17,8 @@ const pricingPlans = [
       "Monthly Security Reports",
     ],
     icon: Shield,
+    featured: false,
+    href: "/offers/basic-security",
   },
   {
     id: 2,
@@ -32,6 +34,7 @@ const pricingPlans = [
     ],
     icon: Lock,
     featured: true,
+    href: "/offers/advanced-protection",
   },
   {
     id: 3,
@@ -46,6 +49,8 @@ const pricingPlans = [
       "Compliance Management",
     ],
     icon: Database,
+    featured: false,
+    href: "/offers/enterprise-shield",
   },
 ];
 
@@ -97,7 +102,7 @@ const Offers: React.FC = () => {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.2 }}
-              className={`rounded-2xl p-8 ${
+              className={`rounded-2xl p-4 ${
                 plan.featured
                   ? "bg-primary text-primary-foreground shadow-xl scale-105"
                   : "bg-card text-card-foreground shadow-md shadow-black/20"
@@ -109,6 +114,7 @@ const Offers: React.FC = () => {
               <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
               <p className="text-sm mb-6">{plan.description}</p>
               <div className="mb-6">
+                <span className="text-xl">Starting :- </span>
                 <span className="text-4xl font-bold">
                   ₹{userPrices[plan.id] || plan.price[0]}
                 </span>
@@ -122,16 +128,18 @@ const Offers: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              <button
-                onClick={() => (window.location.href = "/contact-us")}
-                className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
-                  plan.featured
-                    ? "bg-background text-primary hover:bg-secondary"
-                    : "bg-primary text-primary-foreground hover:bg-primary/90"
-                }`}
-              >
-                Get Started
-              </button>
+              <Link to={plan.href}>
+                <button
+                  // onClick={() => (window.location.href = "/contact-us")}
+                  className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
+                    plan.featured
+                      ? "bg-background text-primary hover:bg-secondary"
+                      : "bg-primary text-primary-foreground hover:bg-primary/90"
+                  }`}
+                >
+                  Get Started
+                </button>
+              </Link>
             </motion.div>
           ))}
         </div>

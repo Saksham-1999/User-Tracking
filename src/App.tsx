@@ -23,6 +23,9 @@ import LatestNews from "./pages/LatestNews";
 import Customers from "./pages/Customers";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import BasicSecurity from "./pages/OfferPlans/BasicSecurity";
+import AdvancedProtection from "./pages/OfferPlans/AdvancedProtection";
+import EnterpriseShield from "./pages/OfferPlans/EnterpriseShield";
 import { UserTrackingProvider } from "./Contexts/UserTrackingContext";
 
 function App() {
@@ -169,14 +172,31 @@ function App() {
               </Layout>
             }
           />
-          {/* <Route
-          path="/cookie-settings"
-          element={
-            <Layout>
-              <CookieSetting/>
-            </Layout>
-          }
-        /> */}
+          <Route
+            path="/offers/basic-security"
+            element={
+              <Layout>
+                <BasicSecurity />
+              </Layout>
+            }
+          />
+          <Route
+            path="/offers/advanced-protection"
+            element={
+              <Layout>
+                <AdvancedProtection />
+              </Layout>
+            }
+          />
+          <Route
+            path="/offers/enterprise-shield"
+            element={
+              <Layout>
+                <EnterpriseShield />
+              </Layout>
+            }
+          />
+
           <Route path="*" element={<NotFound />} />
           <Route path="/error" element={<ErrorPage />} />
         </Routes>
