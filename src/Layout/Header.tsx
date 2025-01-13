@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useLocation } from "react-router-dom";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -14,7 +14,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { ChevronDown, Menu, Phone } from "lucide-react";
+import { Menu, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 import {
@@ -25,7 +25,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-
 
 const productsItems = [
   { name: "Phishing Plugin Tool", link: "/phishing-prevention-tool" },
@@ -49,7 +48,7 @@ function Header() {
   return (
     <header className="w-full px-3 lg:px-20">
       <Sheet>
-        <div className="container flex items-center justify-between py-4">
+        <div className="container flex items-center justify-between py-1 md:py-4">
           <Link to="/" className="flex flex-col">
             <div className="flex items-center space-x-2">
               <img src={logo} className="h-8 rounded-sm" alt="Ekjal logo" />
@@ -57,13 +56,13 @@ function Header() {
                 <span className="text-2xl font-semibold text-primary">
                   Ekvayu
                 </span>
-                <span className="text-xs text-muted-foreground -mt-1">
+                <span className="text-[10px] md:text-xs lg:text-sm text-muted-foreground -mt-1">
                   EMBRACE CHALLENGES, EXPLORE NEW FRONTIERS
                 </span>
               </div>
             </div>
           </Link>
-          <nav className="hidden md:flex space-x-10">
+          <nav className="hidden lg:flex space-x-10">
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
@@ -154,87 +153,69 @@ function Header() {
             </NavigationMenu>
           </nav>
           <div className="flex items-center space-x-4">
-            <Button variant="default" asChild className="hidden md:flex">
+            <Button variant="default" asChild className="hidden lg:flex">
               <Link to="/contact-us">
                 <Phone className="h-4 w-4 mr-2" />
                 <span>Contact Us</span>
               </Link>
             </Button>
-            <SheetTrigger className="md:hidden">
+            <SheetTrigger className="lg:hidden">
               <Menu className="h-6 w-6" />
               <span className="sr-only">Open menu</span>
             </SheetTrigger>
           </div>
 
-          <SheetContent className="flex flex-col bg-background">
+          <SheetContent className="flex flex-col bg-background w-[90%]">
             <SheetHeader className="border-b pb-4 mb-4">
               <SheetTitle className="text-2xl font-bold">Menu</SheetTitle>
             </SheetHeader>
             <nav className="flex-grow">
-              {/* Products Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger className="w-full text-left p-2 text-lg font-medium hover:bg-primary hover:text-secondary transition-colors flex items-center justify-between">
-                  Products <ChevronDown className="w-5 h-5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-full">
-                  {productsItems.map((item, index) => (
-                    <DropdownMenuItem
-                      key={index}
-                      className="py-2 hover:bg-primary hover:text-secondary"
-                    >
-                      <SheetClose asChild>
-                        <Link to={item.link} className="w-full block">
+              <Accordion type="single" collapsible>
+                <AccordionItem value="products">
+                  <AccordionTrigger className="text-lg font-medium">
+                    Products
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    {productsItems.map((item, index) => (
+                      <SheetClose key={index} asChild>
+                        <Link
+                          to={item.link}
+                          className="block py-2 px-4 hover:bg-primary hover:text-secondary transition-colors border-b"
+                        >
                           {item.name}
                         </Link>
                       </SheetClose>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    ))}
+                  </AccordionContent>
+                </AccordionItem>
 
-              {/* Offerings Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger className="w-full text-left p-2 text-lg font-medium hover:bg-primary hover:text-secondary transition-colors flex items-center justify-between">
-                  Offerings <ChevronDown className="w-5 h-5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-full">
-                  {offeringItems.map((item, index) => (
-                    <DropdownMenuItem
-                      key={index}
-                      className="py-2 hover:bg-primary hover:text-secondary"
-                    >
-                      <SheetClose asChild>
-                        <Link to={item.link} className="w-full block">
+                <AccordionItem value="offerings">
+                  <AccordionTrigger className="text-lg font-medium">
+                    Offerings
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    {offeringItems.map((item, index) => (
+                      <SheetClose key={index} asChild>
+                        <Link
+                          to={item.link}
+                          className="block py-2 px-4 hover:bg-primary hover:text-secondary transition-colors border-b"
+                        >
                           {item.name}
                         </Link>
                       </SheetClose>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    ))}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
 
-              {/* Regular Nav Items */}
+              {/* Keep the regular nav items as they are */}
               <SheetClose asChild>
-                <Link
-                  to="/jobs"
-                  className={`block p-2 rounded-md text-lg font-medium hover:bg-primary hover:text-secondary transition-colors ${
-                    location.pathname === "/jobs"
-                      ? "text-primary"
-                      : "text-foreground"
-                  }`}
-                >
+                <Link to="/jobs" className="block p-2 text-lg font-medium">
                   Jobs
                 </Link>
               </SheetClose>
               <SheetClose asChild>
-                <Link
-                  to="/about-us"
-                  className={`block p-2 rounded-md text-lg font-medium hover:bg-primary hover:text-secondary transition-colors ${
-                    location.pathname === "/about-us"
-                      ? "text-primary"
-                      : "text-foreground"
-                  }`}
-                >
+                <Link to="/about-us" className="block p-2 text-lg font-medium">
                   About Us
                 </Link>
               </SheetClose>

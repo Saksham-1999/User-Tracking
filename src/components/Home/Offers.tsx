@@ -100,7 +100,7 @@ const Offers: React.FC = () => {
               className={`rounded-2xl p-8 ${
                 plan.featured
                   ? "bg-primary text-primary-foreground shadow-xl scale-105"
-                  : "bg-card text-card-foreground"
+                  : "bg-card text-card-foreground shadow-md shadow-black/20"
               }`}
             >
               <div className="flex justify-center mb-6">

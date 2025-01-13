@@ -147,9 +147,9 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
-  console.log("User Info:", userInfo);
-  console.log("Visited Routes:", visitedRoutes);
-  console.log("Ekvayu Visit Count:", ekvayuVisitCount);
+//   console.log("User Info:", userInfo);
+//   console.log("Visited Routes:", visitedRoutes);
+//   console.log("Ekvayu Visit Count:", ekvayuVisitCount);
 
   return (
     <UserTrackingContext.Provider
