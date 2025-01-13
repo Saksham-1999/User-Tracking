@@ -29,7 +29,7 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const BASE_URL =
     process.env.NODE_ENV === "development"
-      ? "http://localhost"
+      ? "http://localhost:5173"
       : "https://ekvayu.com";
 
   const getUserSystemInfo = () => {
@@ -64,15 +64,15 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const postUserInfo = async (info: UserInfo) => {
     try {
-      //   const response = await fetch("YOUR_API_ENDPOINT/track-user", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify(info),
-      //   });
+      const response = await fetch("YOUR_API_ENDPOINT/track-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(info),
+      });
 
-      if (info) {
+      if (response.ok) {
         localStorage.setItem("user_tracking_info", JSON.stringify(info));
       }
     } catch (error) {
@@ -81,6 +81,14 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const trackRouteVisit = (pathname: string) => {
+    if (pathname === BASE_URL || pathname.startsWith(BASE_URL)) {
+      setEkvayuVisitCount((prevCount) => {
+        const updatedCount = prevCount + 1;
+        localStorage.setItem("ekvayu_visit_count", String(updatedCount));
+        return updatedCount;
+      });
+    }
+
     setVisitedRoutes((prevRoutes) => {
       if (!prevRoutes.includes(pathname)) {
         const updatedRoutes = [...prevRoutes, pathname];
@@ -89,14 +97,6 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       return prevRoutes;
     });
-
-    if (pathname.startsWith(BASE_URL)) {
-      setEkvayuVisitCount((prevCount) => {
-        const updatedCount = prevCount + 1;
-        localStorage.setItem("ekvayu_visit_count", String(updatedCount));
-        return updatedCount;
-      });
-    }
   };
 
   useEffect(() => {
@@ -124,14 +124,26 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     window.addEventListener("popstate", handleRouteChange);
-    window.addEventListener("pushstate", handleRouteChange);
+
+    const originalPushState = history.pushState;
+    history.pushState = function (...args) {
+      originalPushState.apply(this, args);
+      handleRouteChange();
+    };
+
+    const originalReplaceState = history.replaceState;
+    history.replaceState = function (...args) {
+      originalReplaceState.apply(this, args);
+      handleRouteChange();
+    };
 
     // Initial route tracking
     handleRouteChange();
 
     return () => {
       window.removeEventListener("popstate", handleRouteChange);
-      window.removeEventListener("pushstate", handleRouteChange);
+      history.pushState = originalPushState;
+      history.replaceState = originalReplaceState;
     };
   }, []);
 
