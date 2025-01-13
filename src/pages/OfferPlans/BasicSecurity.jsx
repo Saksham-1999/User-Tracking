@@ -19,7 +19,7 @@ const basicSecurityOffers = [
     description:
       "Round-the-clock monitoring of your premises with advanced camera systems",
     icon: FaVideo,
-    price: "$299/month",
+    price: "$2499/month",
     features: ["HD Cameras", "Night Vision", "Motion Detection"],
   },
   {
@@ -27,7 +27,7 @@ const basicSecurityOffers = [
     title: "Access Control",
     description: "Secure entry management system with biometric authentication",
     icon: FaFingerprint,
-    price: "$199/month",
+    price: "$1999/month",
     features: ["Fingerprint Scanner", "Key Card Access", "Visitor Management"],
   },
   {
@@ -35,7 +35,7 @@ const basicSecurityOffers = [
     title: "Intrusion Detection",
     description: "Advanced sensor network to detect unauthorized access",
     icon: FaBell,
-    price: "$249/month",
+    price: "$2999/month",
     features: ["Motion Sensors", "Window Sensors", "Door Contacts"],
   },
   {
@@ -43,7 +43,7 @@ const basicSecurityOffers = [
     title: "Cyber Security Basic",
     description: "Essential digital security package for small businesses",
     icon: FaShieldAlt,
-    price: "$399/month",
+    price: "$3999/month",
     features: ["Firewall Protection", "Antivirus", "Email Security"],
   },
   {
@@ -51,7 +51,7 @@ const basicSecurityOffers = [
     title: "Guard Patrol",
     description: "Professional security personnel for physical premises",
     icon: FaUsers,
-    price: "$599/month",
+    price: "$5999/month",
     features: ["Trained Guards", "Regular Patrols", "Incident Response"],
   },
   {
@@ -59,7 +59,7 @@ const basicSecurityOffers = [
     title: "Smart Locks",
     description: "IoT-enabled smart locking systems for all entry points",
     icon: FaLock,
-    price: "$179/month",
+    price: "$2499/month",
     features: ["Remote Access", "Activity Logs", "Emergency Override"],
   },
   {
@@ -67,7 +67,7 @@ const basicSecurityOffers = [
     title: "Video Analytics",
     description: "AI-powered video monitoring and analysis",
     icon: FaEye,
-    price: "$349/month",
+    price: "$4499/month",
     features: ["Face Recognition", "Object Detection", "Behavioral Analysis"],
   },
   {
@@ -75,7 +75,7 @@ const basicSecurityOffers = [
     title: "Emergency Response",
     description: "Quick response system for security emergencies",
     icon: FaClock,
-    price: "$279/month",
+    price: "$3499/month",
     features: ["24/7 Support", "Mobile App", "Priority Response"],
   },
   {
@@ -83,7 +83,7 @@ const basicSecurityOffers = [
     title: "Key Management",
     description: "Secure key storage and management system",
     icon: FaKey,
-    price: "$149/month",
+    price: "$2999/month",
     features: ["Digital Vault", "Access Logging", "Key Tracking"],
   },
   {
@@ -91,7 +91,7 @@ const basicSecurityOffers = [
     title: "Basic Security Bundle",
     description: "Complete security package for essential protection",
     icon: FaShieldAlt,
-    price: "$799/month",
+    price: "$6999/month",
     features: [
       "All Basic Features",
       "Monthly Reports",

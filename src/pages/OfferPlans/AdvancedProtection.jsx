@@ -20,7 +20,7 @@ const advancedSecurityOffers = [
     description:
       "Advanced machine learning algorithms for real-time threat analysis",
     icon: FaRobot,
-    price: "$999/month",
+    price: "$7499/month",
     features: [
       "Behavioral Analysis",
       "Predictive Alerts",
@@ -32,7 +32,7 @@ const advancedSecurityOffers = [
     title: "Enterprise Network Security",
     description: "Complete network protection for large-scale operations",
     icon: FaNetworkWired,
-    price: "$1499/month",
+    price: "$8999/month",
     features: ["DDOS Protection", "Network Monitoring", "Traffic Analysis"],
   },
   {
@@ -40,7 +40,7 @@ const advancedSecurityOffers = [
     title: "Data Encryption Suite",
     description: "Military-grade encryption for sensitive data",
     icon: FaDatabase,
-    price: "$899/month",
+    price: "$6999/month",
     features: ["End-to-End Encryption", "Secure Storage", "Key Management"],
   },
   {
@@ -48,7 +48,7 @@ const advancedSecurityOffers = [
     title: "Advanced Identity Protection",
     description: "Multi-factor authentication and identity verification",
     icon: FaUserShield,
-    price: "$799/month",
+    price: "$7999/month",
     features: ["Biometric Auth", "Zero Trust Security", "Identity Management"],
   },
   {
@@ -56,7 +56,7 @@ const advancedSecurityOffers = [
     title: "Cyber Intelligence",
     description: "Proactive threat intelligence and monitoring",
     icon: FaUserSecret,
-    price: "$1299/month",
+    price: "$9499/month",
     features: ["Dark Web Monitoring", "Threat Intelligence", "Risk Assessment"],
   },
   {
@@ -64,7 +64,7 @@ const advancedSecurityOffers = [
     title: "Cloud Security Platform",
     description: "Comprehensive cloud infrastructure protection",
     icon: FaServer,
-    price: "$1199/month",
+    price: "$8499/month",
     features: ["Cloud Firewall", "Asset Protection", "Compliance Management"],
   },
   {
@@ -72,7 +72,7 @@ const advancedSecurityOffers = [
     title: "Security Operations Center",
     description: "24/7 dedicated security monitoring and response",
     icon: FaLaptopCode,
-    price: "$2499/month",
+    price: "$10999/month",
     features: ["Incident Response", "Real-time Monitoring", "Threat Hunting"],
   },
   {
@@ -80,7 +80,7 @@ const advancedSecurityOffers = [
     title: "Advanced Access Control",
     description: "Enterprise-grade access management system",
     icon: FaFingerprint,
-    price: "$899/month",
+    price: "$7999/month",
     features: ["Role-based Access", "SSO Integration", "Audit Trails"],
   },
   {
@@ -88,7 +88,7 @@ const advancedSecurityOffers = [
     title: "Remote Security Management",
     description: "Comprehensive remote security infrastructure",
     icon: FaSatelliteDish,
-    price: "$1099/month",
+    price: "$8999/month",
     features: ["Remote Monitoring", "Mobile Security", "Global Coverage"],
   },
   {
@@ -96,7 +96,7 @@ const advancedSecurityOffers = [
     title: "Enterprise Security Bundle",
     description: "All-inclusive enterprise security solution",
     icon: FaShieldAlt,
-    price: "$2999/month",
+    price: "$11999/month",
     features: ["All Advanced Features", "Priority Support", "Custom Solutions"],
   },
 ];
@@ -124,7 +124,7 @@ function AdvancedProtection() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-           className="bg-card rounded-xl p-6 shadow-lg hover:border-primary transition-all duration-300 border-2 border-primary/20 flex flex-col justify-between"
+            className="bg-card rounded-xl p-6 shadow-lg hover:border-primary transition-all duration-300 border-2 border-primary/20 flex flex-col justify-between"
           >
             <div className="flex items-center mb-4">
               <div className="p-3 bg-primary/10 rounded-lg">

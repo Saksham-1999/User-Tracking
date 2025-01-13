@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Shield, Lock, Database, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -7,7 +6,7 @@ const pricingPlans = [
   {
     id: 1,
     name: "Basic Security",
-    price: ["499", "999", "1999"],
+    price: "1999",
     description: "Essential protection for small businesses",
     features: [
       "Vulnerability Assessment",
@@ -23,7 +22,7 @@ const pricingPlans = [
   {
     id: 2,
     name: "Advanced Protection",
-    price: ["2999", "4999", "6999"],
+    price: "6999",
     description: "Comprehensive security for growing companies",
     features: [
       "Everything in Basic",
@@ -39,7 +38,7 @@ const pricingPlans = [
   {
     id: 3,
     name: "Enterprise Shield",
-    price: ["7999", "9999", "11999"],
+    price: "11999",
     description: "Maximum security for large organizations",
     features: [
       "Everything in Advanced",
@@ -54,31 +53,7 @@ const pricingPlans = [
   },
 ];
 
-const Offers: React.FC = () => {
-  const [userPrices, setUserPrices] = useState<{ [key: number]: string }>({});
-
-  useEffect(() => {
-    // Check if user already has stored prices
-    const storedPrices = localStorage.getItem("userPricingPlan");
-
-    if (storedPrices) {
-      // If exists, use stored prices
-      setUserPrices(JSON.parse(storedPrices));
-    } else {
-      // For first time users, generate random prices
-      const newPrices = pricingPlans.reduce((acc, plan) => {
-        // Get random price from plan's price array
-        const randomIndex = Math.floor(Math.random() * plan.price.length);
-        acc[plan.id] = plan.price[randomIndex];
-        return acc;
-      }, {} as { [key: number]: string });
-
-      // Store in localStorage and state
-      localStorage.setItem("userPricingPlan", JSON.stringify(newPrices));
-      setUserPrices(newPrices);
-    }
-  }, []);
-
+const Offers = () => {
   return (
     <section className="py-20 px-4 bg-background">
       <div className="max-w-7xl mx-auto">
@@ -115,9 +90,7 @@ const Offers: React.FC = () => {
               <p className="text-sm mb-6">{plan.description}</p>
               <div className="mb-6">
                 <span className="text-xl">Starting :- </span>
-                <span className="text-4xl font-bold">
-                  ₹{userPrices[plan.id] || plan.price[0]}
-                </span>
+                <span className="text-4xl font-bold">${plan.price}</span>
                 <span className="text-sm">/month</span>
               </div>
               <ul className="space-y-4 mb-8">
