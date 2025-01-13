@@ -64,15 +64,15 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const postUserInfo = async (info: UserInfo) => {
     try {
-      const response = await fetch("YOUR_API_ENDPOINT/track-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(info),
-      });
+      // const response = await fetch("YOUR_API_ENDPOINT/track-user", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(info),
+      // });
 
-      if (response.ok) {
+      if (info) {
         localStorage.setItem("user_tracking_info", JSON.stringify(info));
       }
     } catch (error) {
@@ -146,10 +146,6 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
       history.replaceState = originalReplaceState;
     };
   }, []);
-
-//   console.log("User Info:", userInfo);
-//   console.log("Visited Routes:", visitedRoutes);
-//   console.log("Ekvayu Visit Count:", ekvayuVisitCount);
 
   return (
     <UserTrackingContext.Provider
