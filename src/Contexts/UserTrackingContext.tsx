@@ -1,3 +1,4 @@
+import { userTrackingApi } from "@/Apis/UserTrackingApis";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -8,7 +9,7 @@ interface UserTrackingContextType {
   totalVisitCount: number;
 }
 
-interface UserInfo {
+export interface UserInfo {
   username?: string;
   email?: string;
   phone?: string;
@@ -20,7 +21,7 @@ interface UserInfo {
   visitTimestamp: string;
 }
 
-interface EkvayuData {
+export interface EkvayuData {
   totalEkvayuVisitCount: number;
   users: UserInfo[];
 }
@@ -77,25 +78,34 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   };
 
-  const updateEkvayuStorage = (updatedUserInfo: UserInfo) => {
-    const ekvayuData: EkvayuData = JSON.parse(
-      localStorage.getItem(EKVAYU_STORAGE_KEY) ||
-        '{"totalEkvayuVisitCount":0,"users":[]}'
-    );
+  const updateEkvayuStorage = async (updatedUserInfo: UserInfo) => {
+    try {
+      const ekvayuData: EkvayuData = JSON.parse(
+        localStorage.getItem(EKVAYU_STORAGE_KEY) ||
+          '{"totalEkvayuVisitCount":0,"users":[]}'
+      );
 
-    const userIndex = ekvayuData.users.findIndex(
-      (user) => user.uniqueId === updatedUserInfo.uniqueId
-    );
+      const userIndex = ekvayuData.users.findIndex(
+        (user) => user.uniqueId === updatedUserInfo.uniqueId
+      );
 
-    if (userIndex !== -1) {
-      ekvayuData.users[userIndex] = updatedUserInfo;
-    } else {
-      ekvayuData.users.push(updatedUserInfo);
-      ekvayuData.totalEkvayuVisitCount += 1; // Increment total visit count
-      setTotalVisitCount(ekvayuData.totalEkvayuVisitCount); // Update state
+      if (userIndex !== -1) {
+        ekvayuData.users[userIndex] = updatedUserInfo;
+        await userTrackingApi.updateUserVisit(
+          updatedUserInfo.uniqueId,
+          updatedUserInfo
+        );
+      } else {
+        ekvayuData.users.push(updatedUserInfo);
+        ekvayuData.totalEkvayuVisitCount += 1;
+        setTotalVisitCount(ekvayuData.totalEkvayuVisitCount);
+        await userTrackingApi.saveUserData(updatedUserInfo);
+      }
+
+      localStorage.setItem(EKVAYU_STORAGE_KEY, JSON.stringify(ekvayuData));
+    } catch (error) {
+      console.error("Failed to update user tracking data:", error);
     }
-
-    localStorage.setItem(EKVAYU_STORAGE_KEY, JSON.stringify(ekvayuData));
   };
 
   const trackRouteVisit = (pathname: string) => {
@@ -129,26 +139,52 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   useEffect(() => {
-    const systemInfo = getUserSystemInfo();
+    const initializeUserTracking = async () => {
+      const systemInfo = getUserSystemInfo();
 
-    const ekvayuData: EkvayuData = JSON.parse(
-      localStorage.getItem(EKVAYU_STORAGE_KEY) ||
-        '{"totalEkvayuVisitCount":0,"users":[]}'
-    );
+      try {
+        const existingUserData = await userTrackingApi.getUserData(
+          systemInfo.uniqueId
+        );
+        const totalVisits = await userTrackingApi.getTotalVisits();
 
-    const existingUser = ekvayuData.users.find(
-      (user) => user.uniqueId === systemInfo.uniqueId
-    );
+        const initializedUserInfo = existingUserData || {
+          ...systemInfo,
+          visitedRoutes: [],
+          ekvayuVisitCount: 0,
+        };
 
-    const initializedUserInfo = existingUser || {
-      ...systemInfo,
-      visitedRoutes: [],
-      ekvayuVisitCount: 0,
+        setUserInfo(initializedUserInfo);
+        setEkvayuVisitCount(initializedUserInfo.ekvayuVisitCount);
+        setTotalVisitCount(totalVisits);
+
+        if (!existingUserData) {
+          await updateEkvayuStorage(initializedUserInfo);
+        }
+      } catch (error) {
+        console.error("Failed to initialize user tracking:", error);
+        const ekvayuData: EkvayuData = JSON.parse(
+          localStorage.getItem(EKVAYU_STORAGE_KEY) ||
+            '{"totalEkvayuVisitCount":0,"users":[]}'
+        );
+
+        const existingUser = ekvayuData.users.find(
+          (user) => user.uniqueId === systemInfo.uniqueId
+        );
+
+        const initializedUserInfo = existingUser || {
+          ...systemInfo,
+          visitedRoutes: [],
+          ekvayuVisitCount: 0,
+        };
+
+        setUserInfo(initializedUserInfo);
+        setEkvayuVisitCount(initializedUserInfo.ekvayuVisitCount);
+        updateEkvayuStorage(initializedUserInfo);
+      }
     };
 
-    setUserInfo(initializedUserInfo);
-    setEkvayuVisitCount(initializedUserInfo.ekvayuVisitCount);
-    updateEkvayuStorage(initializedUserInfo);
+    initializeUserTracking();
 
     const handleRouteChange = () => {
       const currentPath = window.location.pathname;
@@ -169,7 +205,6 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
       handleRouteChange();
     };
 
-    // Initial route tracking
     handleRouteChange();
 
     return () => {
