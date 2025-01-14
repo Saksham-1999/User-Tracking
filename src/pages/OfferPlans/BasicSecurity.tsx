@@ -10,6 +10,7 @@ import {
   FaClock,
   FaKey,
 } from "react-icons/fa";
+import { useUserTracking } from "../../Contexts/UserTrackingContext";
 
 const basicSecurityOffers = [
   {
@@ -100,6 +101,10 @@ const basicSecurityOffers = [
 ];
 
 function BasicSecurity() {
+  const { userInfo, totalVisitCount } = useUserTracking();
+
+  console.log("Total visit count", totalVisitCount);
+  console.log("user info", userInfo);
   return (
     <section className="bg-background lg:py-16 py-5 px-3 lg:px-20">
       <motion.div
