@@ -1,7 +1,6 @@
 import { UserInfo } from "../Contexts/UserTrackingContext";
 
-const API_BASE_URL = "http://localhost:8000/api";
-console.log("API_BASE_URL:", API_BASE_URL);
+const API_BASE_URL = process.env.VITE_API_BASE_URL;
 
 export const userTrackingApi = {
   async saveUserData(userData: UserInfo) {
