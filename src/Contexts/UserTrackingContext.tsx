@@ -5,6 +5,7 @@ interface UserTrackingContextType {
   userInfo: UserInfo | null;
   visitedRoutes: string[];
   ekvayuVisitCount: number;
+  totalVisitCount: number;
 }
 
 interface UserInfo {
@@ -18,6 +19,7 @@ const UserTrackingContext = createContext<UserTrackingContextType>({
   userInfo: null,
   visitedRoutes: [],
   ekvayuVisitCount: 0,
+  totalVisitCount: 0,
 });
 
 export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -26,11 +28,15 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [visitedRoutes, setVisitedRoutes] = useState<string[]>([]);
   const [ekvayuVisitCount, setEkvayuVisitCount] = useState<number>(0);
+  const [totalVisitCount, setTotalVisitCount] = useState<number>(() => {
+    const savedTotalVisits = localStorage.getItem("total_visit_count");
+    return savedTotalVisits ? parseInt(savedTotalVisits) : 0;
+  });
 
   const BASE_URL =
     process.env.NODE_ENV === "development"
-      ? "http://localhost:5173"
-      : "https://ekvayu.com";
+      ? "http://localhost:5173/"
+      : "https://ekvayu.com/";
 
   const getUserSystemInfo = () => {
     const userAgent = window.navigator.userAgent;
@@ -64,15 +70,15 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const postUserInfo = async (info: UserInfo) => {
     try {
-      // const response = await fetch("YOUR_API_ENDPOINT/track-user", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(info),
-      // });
+      const response = await fetch("YOUR_API_ENDPOINT/track-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(info),
+      });
 
-      if (info) {
+      if (response.ok) {
         localStorage.setItem("user_tracking_info", JSON.stringify(info));
       }
     } catch (error) {
@@ -80,11 +86,55 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // Add this function to update total visits
+  const updateTotalVisits = async (userId: string, visitCount: number) => {
+    try {
+      // const response = await fetch("YOUR_API_ENDPOINT/total-visits", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     userId,
+      //     visitCount,
+      //   }),
+      // });
+
+      // if (response.ok) {
+      //   const data = await response.json();
+      //   setTotalVisitCount(data.totalVisits);
+      //   localStorage.setItem("total_visit_count", data.totalVisits.toString());
+      // }
+
+      if (userId || visitCount) {
+        const newTotal = getTotalVisitsFromLocalStorage() + 1;
+        setTotalVisitCount(newTotal);
+        localStorage.setItem("total_visit_count", newTotal.toString());
+      }
+    } catch (error) {
+      // Fallback to local calculation if API fails
+      const newTotal = getTotalVisitsFromLocalStorage() + 1;
+      setTotalVisitCount(newTotal);
+      localStorage.setItem("total_visit_count", newTotal.toString());
+    }
+  };
+
+  const getTotalVisitsFromLocalStorage = () => {
+    const allUserVisits = localStorage.getItem("total_visit_count");
+    return allUserVisits ? parseInt(allUserVisits) : 0;
+  };
+
   const trackRouteVisit = (pathname: string) => {
-    if (pathname === BASE_URL || pathname.startsWith(BASE_URL)) {
+    if (pathname === BASE_URL) {
       setEkvayuVisitCount((prevCount) => {
         const updatedCount = prevCount + 1;
         localStorage.setItem("ekvayu_visit_count", String(updatedCount));
+
+        // Update total visits when individual count changes
+        if (userInfo?.uniqueId) {
+          updateTotalVisits(userInfo.uniqueId, updatedCount);
+        }
+
         return updatedCount;
       });
     }
@@ -107,6 +157,11 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     trackUser();
+
+    const savedTotalCount = localStorage.getItem("total_visit_count");
+    if (savedTotalCount) {
+      setTotalVisitCount(Number(savedTotalCount));
+    }
 
     const savedCount = localStorage.getItem("ekvayu_visit_count");
     if (savedCount) {
@@ -149,7 +204,7 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <UserTrackingContext.Provider
-      value={{ userInfo, visitedRoutes, ekvayuVisitCount }}
+      value={{ userInfo, visitedRoutes, ekvayuVisitCount, totalVisitCount }}
     >
       {children}
     </UserTrackingContext.Provider>
