@@ -28,7 +28,6 @@ function CustomersSection() {
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
-    console.log("scrollContainer", scrollContainer);
     if (scrollContainer) {
       const scrollWidth = scrollContainer.scrollWidth;
       const animationDuration = scrollWidth / 300; // Adjust speed as needed

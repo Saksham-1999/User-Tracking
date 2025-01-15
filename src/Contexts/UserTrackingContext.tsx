@@ -1,14 +1,6 @@
-import { userTrackingApi } from "@/Apis/UserTrackingApis";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-
-interface UserTrackingContextType {
-  userInfo: UserInfo | null;
-  visitedRoutes: string[];
-  ekvayuVisitCount: number;
-  totalVisitCount: number;
-  isLoading: boolean;
-}
+import { userTrackingApi } from "@/Apis/UserTrackingApis";
 
 export interface UserInfo {
   username?: string;
@@ -22,15 +14,14 @@ export interface UserInfo {
   visitTimestamp: string;
 }
 
-export interface EkvayuData {
-  totalEkvayuVisitCount: number;
-  users: UserInfo[];
+interface UserTrackingContextType {
+  userInfo: UserInfo[];
+  totalVisitCount: number;
+  isLoading: boolean;
 }
 
 const UserTrackingContext = createContext<UserTrackingContextType>({
-  userInfo: null,
-  visitedRoutes: [],
-  ekvayuVisitCount: 0,
+  userInfo: [],
   totalVisitCount: 0,
   isLoading: true,
 });
@@ -38,13 +29,12 @@ const UserTrackingContext = createContext<UserTrackingContextType>({
 export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [visitedRoutes, setVisitedRoutes] = useState<string[]>([]);
-  const [ekvayuVisitCount, setEkvayuVisitCount] = useState<number>(0);
-  const [totalVisitCount, setTotalVisitCount] = useState<number>(0);
+  const [userInfo, setUserInfo] = useState<UserInfo[]>([]);
+  const [totalVisitCount, setTotalVisitCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   const getOrCreateUserId = (): string => {
+    if (typeof window === "undefined") return ""; // SSR safeguard
     let userId = localStorage.getItem("user_tracking_id");
     if (!userId) {
       userId = uuidv4();
@@ -53,57 +43,59 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
     return userId;
   };
 
-  const getOperatingSystem = (ua: string): string => {
-    if (ua.indexOf("Win") !== -1) return "Windows";
-    if (ua.indexOf("Mac") !== -1) return "MacOS";
-    if (ua.indexOf("Linux") !== -1) return "Linux";
-    if (ua.indexOf("Android") !== -1) return "Android";
-    if (ua.indexOf("iOS") !== -1) return "iOS";
+  const getOperatingSystem = (): string => {
+    const ua = navigator.userAgent;
+    if (/Windows/.test(ua)) return "Windows";
+    if (/Mac/.test(ua)) return "MacOS";
+    if (/Linux/.test(ua)) return "Linux";
+    if (/Android/.test(ua)) return "Android";
+    if (/iOS/.test(ua)) return "iOS";
     return "Unknown OS";
   };
 
-  const getUserSystemInfo = (): UserInfo => {
-    const userAgent = window.navigator.userAgent;
-    const os = getOperatingSystem(userAgent);
-    return {
-      username: "",
-      email: "",
-      phone: "",
-      uniqueId: getOrCreateUserId(),
-      visitedRoutes: [],
-      ekvayuVisitCount: 0,
-      os,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      visitTimestamp: new Date().toISOString(),
-    };
-  };
+  const getUserSystemInfo = (): UserInfo => ({
+    uniqueId: getOrCreateUserId(),
+    visitedRoutes: [],
+    ekvayuVisitCount: 0,
+    os: getOperatingSystem(),
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    visitTimestamp: new Date().toISOString(),
+  });
 
-  const trackRouteVisit = async (pathname: string, userInfo: UserInfo) => {
-    // Add null check and default to empty array if undefined
-    const currentVisitedRoutes = visitedRoutes || [];
-    const isEkvayuRoute =
-      pathname === "/" || pathname.startsWith("http://localhost:5173/");
+  const trackRouteVisit = async (pathname: string) => {
+    const currentUser = userInfo.find(
+      (user) => user.uniqueId === getOrCreateUserId()
+    );
+    if (!currentUser) return;
 
-    const updatedRoutes = currentVisitedRoutes.includes(pathname)
-      ? currentVisitedRoutes
-      : [...currentVisitedRoutes, pathname];
+    const path =
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:5173/"
+        : "https://ekvayu.com/";
 
-    const updatedUserInfo = {
-      ...userInfo,
+    const isEkvayuRoute = pathname === "/" || pathname.startsWith(path);
+
+    const updatedRoutes = currentUser.visitedRoutes.includes(pathname)
+      ? currentUser.visitedRoutes
+      : [...currentUser.visitedRoutes, pathname];
+
+    const updatedEkvayuVisitCount = isEkvayuRoute
+      ? currentUser.ekvayuVisitCount + 1
+      : currentUser.ekvayuVisitCount;
+
+    const updatedUser: UserInfo = {
+      ...currentUser,
       visitedRoutes: updatedRoutes,
-      ekvayuVisitCount: isEkvayuRoute
-        ? userInfo.ekvayuVisitCount + 1
-        : userInfo.ekvayuVisitCount,
+      ekvayuVisitCount: updatedEkvayuVisitCount,
     };
 
     try {
-      await userTrackingApi.updateUserVisit(userInfo.uniqueId, updatedUserInfo);
-      // console.log("Visit updated successfully", updatedUserInfo);
-      setUserInfo(updatedUserInfo);
-      setVisitedRoutes(updatedRoutes);
-      if (isEkvayuRoute) {
-        setEkvayuVisitCount(updatedUserInfo.ekvayuVisitCount);
-      }
+      await userTrackingApi.updateUserVisit(currentUser.uniqueId, updatedUser);
+      setUserInfo((prevUsers) =>
+        prevUsers.map((user) =>
+          user.uniqueId === currentUser.uniqueId ? updatedUser : user
+        )
+      );
     } catch (error) {
       console.error("Failed to update visit:", error);
     }
@@ -112,7 +104,6 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
   const initializeUserInfo = async () => {
     setIsLoading(true);
     const uniqueId = getOrCreateUserId();
-
     if (!uniqueId) return;
 
     try {
@@ -120,22 +111,19 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
       const totalVisits = await userTrackingApi.getTotalVisits();
 
       if (existingUserData) {
-        const userData = existingUserData.user;
-        setUserInfo(userData);
-        setVisitedRoutes(userData.visitedRoutes);
-        setEkvayuVisitCount(userData.ekvayuVisitCount);
+        setUserInfo([existingUserData.user]);
       } else {
         const systemInfo = getUserSystemInfo();
         await userTrackingApi.saveUserData(systemInfo);
-        setUserInfo(systemInfo);
+        setUserInfo([systemInfo]);
       }
 
       setTotalVisitCount(totalVisits);
     } catch (error) {
-      console.error("Failed to initialize tracking:", error);
+      console.error("Failed to initialize user info:", error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -143,18 +131,12 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   useEffect(() => {
-    if (isLoading) return; // Wait until loading is complete
+    if (userInfo.length === 0) return;
 
-    if (!userInfo) {
-      initializeUserInfo(); // Reinitialize if userInfo is null
-      return;
-    }
-
-    const handleRouteChange = async () => {
-      trackRouteVisit(window.location.pathname, userInfo);
+    const handleRouteChange = () => {
+      trackRouteVisit(window.location.pathname);
     };
 
-    window.addEventListener("popstate", handleRouteChange);
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
 
@@ -168,21 +150,19 @@ export const UserTrackingProvider: React.FC<{ children: React.ReactNode }> = ({
       handleRouteChange();
     };
 
-    handleRouteChange();
+    window.addEventListener("popstate", handleRouteChange);
 
     return () => {
       window.removeEventListener("popstate", handleRouteChange);
       history.pushState = originalPushState;
       history.replaceState = originalReplaceState;
     };
-  }, [userInfo, isLoading]);
+  }, [userInfo]);
 
   return (
     <UserTrackingContext.Provider
       value={{
         userInfo,
-        visitedRoutes,
-        ekvayuVisitCount,
         totalVisitCount,
         isLoading,
       }}

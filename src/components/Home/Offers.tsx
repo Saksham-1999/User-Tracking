@@ -77,7 +77,7 @@ const Offers = () => {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.2 }}
-              className={`rounded-2xl p-4 ${
+              className={`rounded-2xl p-4 flex flex-col justify-between ${
                 plan.featured
                   ? "bg-primary text-primary-foreground shadow-xl scale-105"
                   : "bg-card text-card-foreground shadow-md shadow-black/20"
